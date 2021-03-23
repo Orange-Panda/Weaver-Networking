@@ -1,0 +1,16 @@
+{
+  "name": "com.lmirman.weaver",
+  "version": "0.1.0",
+  "displayName": "Weaver Networking Engine",
+  "description": "Weaver is a networking engine created for Unity.",
+  "keywords": [
+    "networking",
+    "tcp"
+  ],
+  "author": {
+    "name": "Luke Mirman",
+    "url": "http://lukemirman.com/"
+  },
+  "type": "tool",
+  "hideInEditor": false
+}

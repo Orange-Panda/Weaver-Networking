@@ -1,0 +1,17 @@
+{
+    "name": "LMirman.Weaver.Editor",
+    "references": [
+        "GUID:c31d05f08b191d143bf938dfa5fb29ea"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
