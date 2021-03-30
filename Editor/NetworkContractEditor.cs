@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace NetworkEngine.Attributes
+namespace LMirman.Weaver.Attributes
 {
 	/// <summary>
 	/// A custom editor window that makes modifying the <see cref="NetworkContract"/> significantly easier.

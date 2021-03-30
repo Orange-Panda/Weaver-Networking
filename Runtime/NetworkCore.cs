@@ -1,5 +1,5 @@
 //NOTE: This file is split between NetworkCore.cs, NetworkCoreServer.cs, and NetworkCoreClient.cs
-using NetworkEngine.Attributes;
+using LMirman.Weaver.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	/// <summary>
 	/// Responsible for managing low level functionality of the network.

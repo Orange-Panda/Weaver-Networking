@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace NetworkEngine.Attributes
+namespace LMirman.Weaver.Attributes
 {
 	/// <summary>
 	/// Prevents a property from ever being modified in the inspector.

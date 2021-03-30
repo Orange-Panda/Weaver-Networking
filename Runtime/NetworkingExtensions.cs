@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	/// <summary>
 	/// Extension methods that are useful for sending data over the network.

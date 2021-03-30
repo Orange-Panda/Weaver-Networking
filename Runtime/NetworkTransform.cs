@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	/// <summary>
 	/// A convenient and built-in way to synchronize transforms over the network.

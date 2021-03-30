@@ -1,9 +1,9 @@
-﻿using NetworkEngine.Attributes;
+﻿using LMirman.Weaver.Attributes;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	/// <summary>
 	/// A scriptable object that contains references to all the networked game objects used in the project.

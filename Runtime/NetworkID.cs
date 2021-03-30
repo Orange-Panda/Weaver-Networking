@@ -1,9 +1,9 @@
-﻿using NetworkEngine.Attributes;
+﻿using LMirman.Weaver.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	/// <summary>
 	/// Used to identify a specific object on the network.

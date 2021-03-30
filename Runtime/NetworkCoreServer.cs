@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	public partial class NetworkCore : MonoBehaviour
 	{

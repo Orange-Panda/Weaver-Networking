@@ -8,7 +8,10 @@ Options for installation:
 	2. In Unity go to Window -> Package Manager
 	3. Press the + icon in the top left
 	4. Click "Add package from Git URL"
-	5. Enter the following into the field and press enter: `https://github.com/Orange-Panda/Weaver-Networking.git`
+	5. Enter the following into the field and press enter: 
+```
+https://github.com/Orange-Panda/Weaver-Networking.git
+```
 - Option B: Package Manager from Disk
 	1. Download the repository and note down where the repository is saved.
 	2. In Unity go to Window -> Package Manager

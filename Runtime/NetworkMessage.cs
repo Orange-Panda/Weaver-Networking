@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NetworkEngine
+namespace LMirman.Weaver
 {
 	/// <summary>
 	/// Creates (<see cref="CreateMessage(Type, List{string})"/>) and parses (<see cref="GetParameters(string)"/>) network messages.
