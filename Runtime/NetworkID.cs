@@ -96,7 +96,7 @@ namespace LMirman.Weaver
 		/// </summary>
 		/// <param name="command">The local command defined on a per <see cref="NetworkComponent"/> basis.</param>
 		/// <param name="args">Argument(s) for the command defined.</param>
-		public void NetworkMessage(string command, List<string> args)
+		public void NetworkMessage(string componentID, string command, List<string> args)
 		{
 			if (NetworkReady)
 			{
@@ -108,7 +108,10 @@ namespace LMirman.Weaver
 				{
 					foreach (NetworkComponent component in components)
 					{
-						component.HandleMessage(command, args);
+						if (component.ComponentID == componentID)
+						{
+							component.MessageReceived(command, args);
+						}
 					}
 				}
 			}

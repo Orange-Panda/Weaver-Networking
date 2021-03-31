@@ -140,11 +140,12 @@ namespace LMirman.Weaver
 			}
 			else if ((param.type == NetworkMessage.Type.Command && IsServer) || (param.type == NetworkMessage.Type.Update && IsClient))
 			{
-				if (param.args.Count >= 2 && int.TryParse(param.args[0], out int netID) && NetObjects.ContainsKey(netID))
+				if (param.args.Count >= 3 && int.TryParse(param.args[0], out int netID) && NetObjects.ContainsKey(netID))
 				{
-					string type = param.args[1];
-					param.args.RemoveRange(0, 2);
-					NetObjects[netID].NetworkMessage(type, param.args);
+					string componentID = param.args[1];
+					string type = param.args[2];
+					param.args.RemoveRange(0, 3);
+					NetObjects[netID].NetworkMessage(componentID, type, param.args);
 				}
 			}
 		}

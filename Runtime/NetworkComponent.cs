@@ -14,29 +14,58 @@ namespace LMirman.Weaver
 	public abstract class NetworkComponent : MonoBehaviour
 	{
 		protected NetworkID networkID;
-		protected const string DirtyCommand = "D";
+
+		private const string DirtyCommand = "1";
+		private const string UndirtyCommand = "2";
 
 		public bool IsLocalPlayer => networkID.NetworkReady && NetworkCore.ActiveNetwork && NetworkCore.ActiveNetwork.LocalPlayerId == networkID.Owner;
 		protected bool IsClient => NetworkCore.ActiveNetwork && NetworkCore.ActiveNetwork.IsClient;
 		protected bool IsServer => NetworkCore.ActiveNetwork && NetworkCore.ActiveNetwork.IsServer;
 		public int Owner => networkID.Owner;
-
+		/// <summary>
+		/// Identifies this network component, avoiding conflicting messages on the same object.
+		/// </summary>
+		public virtual string ComponentID => "0";
 		/// <summary>
 		/// The instance ID of the object on the server. Essentially the identifier for this particular object.
 		/// </summary>
-		protected int NetId => networkID.NetId;
+		public int NetId => networkID.NetId;
+
+		protected bool Dirty { get; private set; }
 
 		/// <summary>
 		/// Called after the network engine is ready. It is safe to use the network engine within here.
 		/// </summary>
-		protected abstract IEnumerator NetworkUpdate();
+		protected virtual IEnumerator NetworkUpdate() { yield break; }
 
 		/// <summary>
-		/// When a packet has been sent towards this network object, this method is called to behave off of it.
+		/// When a special packet has been sent towards this network object, this method is called to behave off of it.
 		/// </summary>
 		/// <param name="command">The type of message that has been sent to this network object.</param>
 		/// <param name="args">The parameter(s) of the message.</param>
-		public abstract void HandleMessage(string command, List<string> args);
+		public virtual void HandleMessage(string command, List<string> args) { }
+
+		/// <summary>
+		/// Handles packets sent to this particular network object. If it is specially defined it will go to <see cref="HandleMessage(string, List{string})"/>
+		/// </summary>
+		/// <param name="command">The type of message that has been sent to this network object.</param>
+		/// <param name="args">The parameter(s) of the message.</param>
+		public void MessageReceived(string command, List<string> args)
+		{
+			if (IsServer && command.Equals(DirtyCommand))
+			{
+				Dirty = true;
+			}
+			else if (IsClient && command.Equals(UndirtyCommand))
+			{
+				Dirty = false;
+				DeserializeData(args);
+			}
+			else
+			{
+				HandleMessage(command, args);
+			}
+		}
 
 		/// <summary>
 		/// Traditional Awake() functionality. Called after <see cref="networkID"/> is defined.
@@ -44,33 +73,55 @@ namespace LMirman.Weaver
 		/// <remarks>May be called before the network is ready. Use <see cref="NetworkUpdate"/> if you need to ensure network functionality.</remarks>
 		protected virtual void OnAwake() { }
 
-		/// <summary>
-		/// Traditional Start() functionality.
-		/// </summary>
-		/// <remarks>May be called before the network is ready. Use <see cref="NetworkUpdate"/> if you need to ensure network functionality.</remarks>
-		protected virtual void OnStart() { }
-
 		protected void Awake()
 		{
 			networkID = GetComponent<NetworkID>();
 			OnAwake();
 		}
 
+		/// <summary>
+		/// Traditional Start() functionality.
+		/// </summary>
+		/// <remarks>May be called before the network is ready. Use <see cref="NetworkUpdate"/> if you need to ensure network functionality.</remarks>
+		protected virtual void OnStart() { }
+
 		protected IEnumerator Start()
 		{
 			OnStart();
 			yield return new WaitUntil(() => networkID.NetworkReady);
+			MarkDirty();
 			StartCoroutine(NetworkUpdate());
 		}
 
 		/// <summary>
-		/// Send a dirty message to the server. Dirty must be implemented on a per object basis.
+		/// Send a dirty message to the server.
 		/// </summary>
-		protected void FlagDirtyToServer()
+		protected void MarkDirty()
 		{
+			Dirty = true;
+			
 			if (IsClient)
 			{
-				networkID.AddMessage(NetworkMessage.CreateMessage(NetworkMessage.Type.Command, new List<string>() { NetId.ToString(), DirtyCommand }));
+				networkID.AddMessage(NetworkMessage.CreateMessage(NetworkMessage.Type.Command, new List<string>() { NetId.ToString(), ComponentID, DirtyCommand }));
+			}
+		}
+
+		protected virtual void OnEnable()
+		{
+			NetworkCore.ActiveNetwork.NetworkTick += OnNetworkTick;
+		}
+
+		protected virtual void OnDisable()
+		{
+			NetworkCore.ActiveNetwork.NetworkTick -= OnNetworkTick;
+		}
+
+		protected virtual void OnNetworkTick()
+		{
+			if (Dirty && IsServer)
+			{
+				Dirty = false;
+				SendToClient(UndirtyCommand, SerializeData());
 			}
 		}
 
@@ -102,7 +153,8 @@ namespace LMirman.Weaver
 			else
 			{
 				args.Insert(0, NetId.ToString());
-				args.Insert(1, type);
+				args.Insert(1, ComponentID);
+				args.Insert(2, type);
 			}
 
 			if (IsClient && IsLocalPlayer)
@@ -139,7 +191,8 @@ namespace LMirman.Weaver
 			else
 			{
 				args.Insert(0, NetId.ToString());
-				args.Insert(1, type);
+				args.Insert(1, ComponentID);
+				args.Insert(2, type);
 			}
 
 			if (IsServer)
@@ -147,5 +200,18 @@ namespace LMirman.Weaver
 				networkID.AddMessage(NetworkMessage.CreateMessage(NetworkMessage.Type.Update, args));
 			}
 		}
+
+		/// <summary>
+		/// Creates a List of string arguments for the data to be sent over the server when dirty.
+		/// </summary>
+		protected virtual List<string> SerializeData()
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Deserializes the data sent from <see cref="SerializeData()">
+		/// </summary>
+		protected virtual void DeserializeData(List<string> args) { }
 	}
 }

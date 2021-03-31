@@ -10,8 +10,8 @@ namespace LMirman.Weaver
 	/// <remarks>Simply add this component to a gameObject and its transform rotation and position will be synchronized over the server.</remarks>
 	public class NetworkTransform : NetworkComponent
 	{
-		private const string UpdateCommand = "P";
-	
+		public override string ComponentID => "T";
+
 		[Tooltip("The visual component of the gameObject. This is hidden before the object position has been set, preventing it from appearing at the center of the world briefly.")]
 		public GameObject visual;
 
@@ -25,9 +25,6 @@ namespace LMirman.Weaver
 		private Vector3 lastPositionSent;
 		private Quaternion lastRotationSent;
 
-		//Client & Server
-		private bool dirty = true;
-
 		protected override void OnAwake()
 		{
 			base.OnAwake();
@@ -36,9 +33,15 @@ namespace LMirman.Weaver
 
 		protected override IEnumerator NetworkUpdate()
 		{
-			FlagDirtyToServer();
-			yield return new WaitUntil(() => !dirty);
-			yield return new WaitForSeconds(NetworkCore.UpdateDelta);
+			MarkDirty();
+
+			float timer = 0.5f;
+			while (timer > 0 && Dirty)
+			{
+				timer -= Time.deltaTime;
+				yield return null;
+			}
+
 			SetVisualState(true);
 		}
 
@@ -51,63 +54,20 @@ namespace LMirman.Weaver
 			}
 		}
 
-		private void OnEnable()
+		protected override void OnNetworkTick()
 		{
-			NetworkCore.ActiveNetwork.NetworkTick += ActiveNetwork_NetworkTick;
-		}
+			base.OnNetworkTick();
 
-		private void OnDisable()
-		{
-			NetworkCore.ActiveNetwork.NetworkTick -= ActiveNetwork_NetworkTick;
-		}
-
-		private void ActiveNetwork_NetworkTick()
-		{
 			//Send the transform information to clients if it has been modified.
 			if (IsServer)
 			{
 				Vector3 roundedPosition = transform.position.Rounded();
-				if (dirty || roundedPosition != lastPositionSent || Quaternion.Angle(lastRotationSent, transform.rotation) > 2)
+				if (roundedPosition != lastPositionSent || Quaternion.Angle(lastRotationSent, transform.rotation) > 2)
 				{
-					dirty = false;
 					lastPositionSent = roundedPosition;
 					lastRotationSent = transform.rotation;
-					List<string> args = new List<string>()
-					{
-						roundedPosition.x.ToNetworkString(),
-						roundedPosition.y.ToNetworkString(),
-						roundedPosition.z.ToNetworkString(),
-						transform.rotation.x.ToNetworkString(),
-						transform.rotation.y.ToNetworkString(),
-						transform.rotation.z.ToNetworkString(),
-						transform.rotation.w.ToNetworkString()
-					};
-					SendToClient(UpdateCommand, args);
+					MarkDirty();
 				}
-			}
-		}
-
-		public override void HandleMessage(string command, List<string> args)
-		{
-			//Parse the data of the object from the server.
-			if (IsClient && command.Equals(UpdateCommand))
-			{
-				dirty = false;
-				if (args.Count >= 3)
-				{
-					positionObjective = new Vector3(float.Parse(args[0]), float.Parse(args[1]), float.Parse(args[2]));
-				}
-
-				if (args.Count >= 7)
-				{
-					rotationObjective = new Quaternion(float.Parse(args[3]), float.Parse(args[4]), float.Parse(args[5]), float.Parse(args[6]));
-				}
-			}
-
-			//Occurs when the client has requested a refresh for the object.
-			if (IsServer && command.Equals(DirtyCommand))
-			{
-				dirty = true;
 			}
 		}
 
@@ -117,6 +77,34 @@ namespace LMirman.Weaver
 			{
 				visual.SetActive(value);
 			}
+		}
+
+		protected override void DeserializeData(List<string> args)
+		{
+			if (args.Count >= 3)
+			{
+				positionObjective = new Vector3(float.Parse(args[0]), float.Parse(args[1]), float.Parse(args[2]));
+			}
+
+			if (args.Count >= 7)
+			{
+				rotationObjective = new Quaternion(float.Parse(args[3]), float.Parse(args[4]), float.Parse(args[5]), float.Parse(args[6]));
+			}
+		}
+
+		protected override List<string> SerializeData()
+		{
+			Vector3 roundedPosition = transform.position.Rounded();
+			return new List<string>()
+			{
+				roundedPosition.x.ToNetworkString(),
+				roundedPosition.y.ToNetworkString(),
+				roundedPosition.z.ToNetworkString(),
+				transform.rotation.x.ToNetworkString(),
+				transform.rotation.y.ToNetworkString(),
+				transform.rotation.z.ToNetworkString(),
+				transform.rotation.w.ToNetworkString()
+			};
 		}
 	}
 }
