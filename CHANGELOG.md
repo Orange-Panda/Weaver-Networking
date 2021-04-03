@@ -3,6 +3,15 @@ All notable changes to this package are documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2021-04-03
+
+### Changed
+- Network Core instantiates using a string key lookup instead of network contract index.
+	- The Network Contract will still reference the player via index.
+
+### Fixed
+- Editor will not longer send a warning when exiting playmode.
+
 ## [0.2.0] - 2021-03-30
 
 ### Added

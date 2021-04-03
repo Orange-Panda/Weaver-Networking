@@ -21,7 +21,7 @@ namespace LMirman.Weaver
 		[SerializeField, DisableInPlayMode, Range(1, 128), Header("Network Settings")]
 		private int maxConnections = 32;
 		[SerializeField, DisableInPlayMode, Tooltip("Objects created, with server ownership, when the server is started.")]
-		private int[] initialObjects = new int[0];
+		private string[] initialObjects = new string[0];
 		public const int UpdateRate = 50;
 		public const float UpdateDelta = 1f / UpdateRate;
 
@@ -286,6 +286,9 @@ namespace LMirman.Weaver
 		private float forceQuitTime = 0;
 		private bool Application_wantsToQuit()
 		{
+#if UNITY_EDITOR
+			return true;
+#else
 			if (IsConnected && forceQuitTime < Time.unscaledTime)
 			{
 				forceQuitTime = Time.unscaledTime + 1f; //If stuck, the user can press twice quickly to force close.
@@ -296,6 +299,7 @@ namespace LMirman.Weaver
 			{
 				return true;
 			}
+#endif
 		}
 		#endregion
 	}

@@ -101,9 +101,16 @@ namespace LMirman.Weaver
 		/// </summary>
 		private static string CleanString(string value)
 		{
-			value = value.Replace('#', ' ');
-			value = value.Replace('\n', ' ');
-			return value;
+			try 
+			{
+				value = value.Replace('#', ' ');
+				value = value.Replace('\n', ' ');
+				return value;
+			}
+			catch (System.NullReferenceException)
+			{
+				return string.Empty;
+			}
 		}
 
 		public enum Type

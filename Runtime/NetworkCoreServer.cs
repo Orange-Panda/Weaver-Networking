@@ -126,9 +126,12 @@ namespace LMirman.Weaver
 				yield break;
 			}
 
-			foreach (int initialObject in initialObjects)
+			foreach (string initialObject in initialObjects)
 			{
-				CreateNetworkObject(initialObject);
+				if (NetworkItems.TryGetIndex(initialObject, out int id))
+				{
+					CreateNetworkObject(id);
+				}
 			}
 
 			while (IsConnected)
