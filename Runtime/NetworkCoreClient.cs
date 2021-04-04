@@ -41,10 +41,20 @@ namespace LMirman.Weaver
 			clientSocket.BeginConnect(endPoint, ConnectingCallback, clientSocket);
 
 			//Wait for the client to connect
-			yield return new WaitUntil(() => IsConnected);
-			CurrentlyConnecting = false;
-			StartCoroutine(Connections[0].Receive());  //It is 0 on the client because we only have 1 socket.
-			StartCoroutine(NetworkUpdate());  //This will allow the client to send messages to the server.
+			yield return new WaitUntil(() => IsConnected || !CurrentlyConnecting);
+			if (IsConnected)
+			{
+				CurrentlyConnecting = false;
+				StartCoroutine(Connections[0].Receive());  //It is 0 on the client because we only have 1 socket.
+				StartCoroutine(NetworkUpdate());  //This will allow the client to send messages to the server.
+			}
+			else
+			{
+				IsClient = false;
+				IsServer = false;
+				IsConnected = false;
+				CurrentlyConnecting = false;
+			}
 		}
 
 		/// <summary>
@@ -52,12 +62,21 @@ namespace LMirman.Weaver
 		/// </summary>
 		private void ConnectingCallback(IAsyncResult result)
 		{
-			TCPConnection newConnection = new TCPConnection(-1, (Socket)result.AsyncState);
-			newConnection.Socket.EndConnect(result);
-			Connections.Add(0, newConnection);
-
-			IsClient = true;
-			IsConnected = true;
+			try
+			{
+				TCPConnection newConnection = new TCPConnection(-1, (Socket)result.AsyncState);
+				newConnection.Socket.EndConnect(result);
+				Connections.Add(0, newConnection);
+				IsClient = true;
+				IsConnected = true;
+			}
+			catch (SocketException)
+			{
+				IsClient = false;
+				IsServer = false;
+				IsConnected = false;
+				CurrentlyConnecting = false;
+			}
 		}
 
 		/// <summary>

@@ -19,7 +19,7 @@ namespace LMirman.Weaver
 		/// </summary>
 		public void StartServer()
 		{
-			if (!IsConnected)
+			if (!IsConnected && !CurrentlyConnecting)
 			{
 				serverListener = StartCoroutine(ServerListen());
 				StartCoroutine(NetworkUpdate());
@@ -242,6 +242,8 @@ namespace LMirman.Weaver
 				IsClient = false;
 				CurrentlyConnecting = false;
 				serverIsDisconnecting = false;
+				ConnectionCount = 0;
+				ObjectCount = 0;
 
 				NetObjects.Clear();
 				Connections.Clear();

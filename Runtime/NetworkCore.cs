@@ -36,17 +36,17 @@ namespace LMirman.Weaver
 		private Socket listenerTCP;
 
 		// Network State
-		public int LocalPlayerId { get; set; } = -1;
+		public int LocalPlayerId { get; private set; } = -1;
 		public bool IsServer { get; private set; } = false;
 		public bool IsClient { get; private set; } = false;
-		private bool CurrentlyConnecting { get; set; } = false;
+		public bool CurrentlyConnecting { get; private set; } = false;
 		public bool IsConnected { get; private set; } = false;
-		public int ConnectionCount { get; set; } = 0;
-		public int ObjectCount { get; set; } = 0;
+		public int ConnectionCount { get; private set; } = 0;
+		public int ObjectCount { get; internal set; } = 0;
 
 		// Message
-		public bool MessageWaiting { get; set; } = false;
-		public string MasterMessage { get; set; } = string.Empty;
+		public bool MessageWaiting { get; internal set; } = false;
+		public string MasterMessage { get; private set; } = string.Empty;
 
 		// Network configuration
 		public string IPAddress { get; private set; } = "127.0.0.1";
