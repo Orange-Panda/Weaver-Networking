@@ -1,5 +1,8 @@
 # Weaver Networking Engine
-Weaver is a basic networking engine created for Unity.
+Weaver was a basic networking engine created for Unity. 
+
+# ⚠️ Disclaimer
+This package was created for educational purposes and is *not* intended for production use. If you are looking for a Unity networking solution you are enocuraged to look at [Fish-Net](https://fish-networking.gitbook.io/docs/), [Mirror](https://mirror-networking.gitbook.io/docs/), or [Netcode for GameObjects](https://docs-multiplayer.unity3d.com/netcode/current/about/).
 
 ## Download and Installation
 Options for installation:
@@ -38,4 +41,3 @@ https://github.com/Orange-Panda/Weaver-Networking.git
 * Packet sizes are limited to a specific length. As a result having too many objects or object data sent at once will cause data to be lost. 
 	* While this limit can be raised it increases the possibility of overflowing the network pipeline, losing clients with slow or unreliable internet.
 * Packets are sent as strings leading to a lot of wasted space on packets.
-* This package is not recommended for production use, but it is a good learning tool/building block for networking functionality.
